@@ -1,5 +1,4 @@
-# Game-BD-Gift
-Using Javascript i created a game. The game can be used for birthday gift.
+# Game-EatCake
 
-Nese deshironi te perdorni foto tjeter, ne folderin images shtoni nje foto te re duke e riemruar happy.png.
-:)
+Version 2.0.0
+Open index.html in browser and play...
