@@ -1,14 +1,15 @@
-const canvas = document.createElement("canvas");
+const canvas = document.createElement('canvas');
 canvas.width = 1200;
 canvas.height = 650;
 document.body.appendChild(canvas);
-const ctx = canvas.getContext("2d");
-const validKeys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "p"];
+const ctx = canvas.getContext('2d');
+const validKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'p'];
 let isGameStoped = true;
 let onPlaying = null;
 let keyDown = null;
 let challenge = 0;
 let gameResult = 0;
+const backgroundColor = '#161a1d';
 
 // emojy settings
 let emojyReady = false;
@@ -21,7 +22,7 @@ let emojiImage = new Image();
 emojiImage.onload = () => {
   emojyReady = true;
 };
-emojiImage.src = "images/hungry.svg";
+emojiImage.src = 'images/hungry.svg';
 
 // cake settings
 let cakeReady = false;
@@ -30,29 +31,14 @@ let cakeImage = new Image();
 cakeImage.onload = () => {
   cakeReady = true;
 };
-cakeImage.src = "images/cake.svg";
+cakeImage.src = 'images/cake.svg';
 
-getRandomInt = (min = 1, max = 5) =>
+getRandomInt = (min = 5, max = 20) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-addEventListener("keydown", ({ key }) => {
+addEventListener('keydown', ({ key }) => {
   if (validKeys.includes(key) && !isGameStoped) keyDown = key;
 });
-
-drawPlayButton = (buttonText = "Play") => {
-  const [x, y, w, h] = [canvas.width / 2 - 100, canvas.height - 100, 200, 50];
-  ctx.roundRect(x, y, w, h, 5);
-  ctx.fillStyle = "#579dff";
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "#579dff";
-  ctx.stroke();
-  ctx.closePath();
-  ctx.font = "24px Arial";
-  ctx.fillStyle = "#fff";
-  ctx.textAlign = "center";
-  ctx.fillText(buttonText, x + w / 2, y + 13);
-};
 
 isInsidePlayAgain = (pos, rect) =>
   pos.x > rect.x &&
@@ -64,11 +50,11 @@ playAgain = () => {
   isGameStoped = false;
   emojy.x = canvas.width / 2 - 25;
   emojy.y = canvas.height / 2 - 25;
-  emojiImage.src = "images/hungry.svg";
+  emojiImage.src = 'images/hungry.svg';
   play();
 };
 
-canvas.addEventListener("click", (evt) => {
+canvas.addEventListener('click', (evt) => {
   const clientRect = canvas.getBoundingClientRect();
   const [x, y] = [evt.clientX - clientRect.left, evt.clientY - clientRect.top];
   if (
@@ -89,7 +75,7 @@ canvas.addEventListener("click", (evt) => {
 changeGameFinal = (gameRes) => {
   isGameStoped = true;
   keyDown = null;
-  emojiImage.src = `images/${gameRes === "win" ? "happy" : "cry"}.svg`;
+  emojiImage.src = `images/${gameRes === 'win' ? 'happy' : 'cry'}.svg`;
   clearInterval(onPlaying);
   setTimeout(() => {
     render();
@@ -97,37 +83,37 @@ changeGameFinal = (gameRes) => {
 };
 
 setResult = (val = 1) => {
-  if (val === -1 && gameResult <= 1) changeGameFinal("lost");
+  if (val === -1 && gameResult <= 1) changeGameFinal('lost');
   else gameResult += val;
 
-  if (gameResult === challenge) changeGameFinal("win");
+  if (gameResult === challenge) changeGameFinal('win');
 };
 
 borderHit = () => {
   keyDown = null;
-  emojiImage.src = "images/dead.svg";
+  emojiImage.src = 'images/dead.svg';
   setResult(-1);
   setTimeout(() => {
-    if (gameResult) emojiImage.src = "images/hungry.svg";
+    if (gameResult) emojiImage.src = 'images/hungry.svg';
   }, 500);
 };
 
 updateDirection = () => {
   if (isGameStoped) return;
   switch (keyDown) {
-    case "ArrowUp":
+    case 'ArrowUp':
       if (emojy.y > 0) emojy.y -= emojySpeed;
       else borderHit();
       break;
-    case "ArrowRight":
+    case 'ArrowRight':
       if (emojy.x < 1150) emojy.x += emojySpeed;
       else borderHit();
       break;
-    case "ArrowDown":
+    case 'ArrowDown':
       if (emojy.y < 600) emojy.y += emojySpeed;
       else borderHit();
       break;
-    case "ArrowLeft":
+    case 'ArrowLeft':
       if (emojy.x > 0) emojy.x -= emojySpeed;
       else borderHit();
       break;
@@ -147,14 +133,6 @@ updateDirection = () => {
   }
 };
 
-getMousePos = (event) => {
-  const rect = canvas.getBoundingClientRect();
-  return {
-    x: event.clientX - rect.left,
-    y: event.clientY - rect.top,
-  };
-};
-
 resetCakePosition = () => {
   cake.x = 25 + Math.random() * (canvas.width - 200);
   cake.y = 25 + Math.random() * (canvas.height - 100);
@@ -170,19 +148,68 @@ renderImages = () => {
   if (cakeReady && !isGameStoped) ctx.drawImage(cakeImage, cake.x, cake.y);
 };
 
-writeText = () => {
-  ctx.fillStyle = "#fdfdfd";
-  ctx.font = "16px Arial";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "top";
-  ctx.fillText(gameResult + " Result", 5, 10);
-  ctx.fillText(challenge + " Challenge", 5, 30);
-  ctx.fillText("Povered by: Blerton Rexha", 5, 630);
+setDefaultTextFormat = () => {
+  ctx.fillStyle = '#fdfdfd';
+  ctx.font = '16px Verdana';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+};
+
+drawRect = (
+  { x, y, w, h },
+  strokeStyle = '#fff',
+  lineWidth = 1,
+  fillStyle = backgroundColor
+) => {
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.strokeStyle = strokeStyle;
+  ctx.lineWidth = lineWidth;
+  if (fillStyle) {
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+  }
+  ctx.stroke();
+  ctx.closePath();
+};
+
+drawPlayButton = (buttonText = 'Play') => {
+  const [x, y, w, h] = [canvas.width / 2 - 100, canvas.height - 100, 200, 50];
+  ctx.roundRect(x, y, w, h, 5);
+  ctx.fillStyle = '#579dff';
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#579dff';
+  ctx.stroke();
+  ctx.closePath();
+  ctx.font = '24px Verdana';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.fillText(buttonText, x + w / 2, y + 13);
+};
+
+writeGuide = () => {
+  drawRect({ x: 400, y: 200, w: 400, h: 170 });
+  setDefaultTextFormat();
+  ctx.fillText('•  Use arrows(↑→↓←) to move Emojy', 430, 230);
+  ctx.fillText('•  Press P to pause', 430, 260);
+  ctx.fillText('Eat cakes until you reach your challenge.', 430, 295);
+  ctx.fillText('If you hit the border, you will lose points', 430, 320);
+};
+
+writeTextResult = () => {
+  drawRect({ x: 20, y: 10, w: 120, h: 34 });
+  drawRect({ x: 20, y: 50, w: 120, h: 34 });
+  setDefaultTextFormat();
+  ctx.fillText('Result', 25, 19);
+  ctx.fillText(gameResult, 115, 19);
+  ctx.fillText('Challenge', 25, 59);
+  ctx.fillText(challenge, 115, 59);
 };
 
 drawResult = () => {
   ctx.beginPath();
-  ctx.strokeStyle = "green";
+  ctx.strokeStyle = 'green';
   ctx.lineWidth = 5;
   ctx.moveTo(10, 645);
   ctx.lineTo((gameResult * (canvas.width - 20)) / challenge + 10, 645);
@@ -190,13 +217,14 @@ drawResult = () => {
 };
 
 render = () => {
-  setBackgroundColor("#161a1d");
+  setBackgroundColor(backgroundColor);
   renderImages();
-  writeText();
+  writeTextResult();
   drawResult();
   updateDirection();
   if (isGameStoped) {
-    drawPlayButton("Play Again");
+    drawPlayButton('Play Again');
+    writeGuide();
   }
 };
 
@@ -207,5 +235,10 @@ play = () => {
   onPlaying = setInterval(render, 1);
 };
 
-render();
-drawPlayButton();
+init = () => {
+  render();
+  drawPlayButton();
+  writeGuide();
+};
+
+init();
